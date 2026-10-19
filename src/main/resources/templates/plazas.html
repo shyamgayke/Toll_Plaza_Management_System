@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toll Plaza Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            margin: 0;
+            padding: 0;
+            color: #243247;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin-left: 250px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+        }
+
+        
+        /* Sidebar navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px;
+            height: 100vh;
+            padding: 25px 15px;
+            box-sizing: border-box;
+            background: #17365d;
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar h2 {
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: #e5edf7;
+            text-decoration: none;
+            padding: 13px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: #2878b5;
+            color: white;
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .container {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+
+
+        .top, .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .top {
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        a, button {
+            display: inline-block;
+            padding: 9px 13px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .primary { background: #2563eb; color: white; }
+        .edit { background: #f59e0b; color: #111827; }
+        .view { background: #0f766e; color: white; }
+        .delete { background: #dc2626; color: white; }
+        .back { background: #e5e7eb; color: #111827; }
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th { background: #eff4fa; }
+
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 18px 0;
+            align-items: center;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 10px 12px;
+            border: 1px solid #ccd6e0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            min-width: 150px;
+        }
+
+        .filter-bar input {
+            flex: 1;
+        }
+
+        .filter-bar button {
+            background: #546575;
+            color: white;
+        }
+
+        .filter-count {
+            color: #546575;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="container">
+    <div class="top">
+        <div>
+            <h1>Toll Plaza Management</h1>
+            <p>View and manage all registered toll plazas.</p>
+        </div>
+        <a th:href="@{/plazas/new}" class="primary">+ Add Toll Plaza</a>
+    </div>
+
+    <div th:if="${success}" class="message success"
+         th:text="${success}"></div>
+    <div th:if="${error}" class="message error"
+         th:text="${error}"></div>
+        
+        <div class="filter-bar">
+            <input type="text"
+                id="plazaSearch"
+                placeholder="Search plaza or highway name...">
+
+            <select id="cityFilter">
+                <option value="">All Cities</option>
+            </select>
+
+            <select id="stateFilter">
+                <option value="">All States</option>
+            </select>
+
+            <select id="statusFilter">
+                <option value="">All Statuses</option>
+            </select>
+
+            <button type="button" id="resetFilters">Reset</button>
+        </div>
+
+    <p class="filter-count" id="filterCount"></p>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Plaza ID</th>
+                <th>Plaza Name</th>
+                <th>Highway</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="plaza-row" th:each="plaza : ${tollPlazas}">
+                <td th:text="${plaza.plazaId}"></td>
+                <td th:text="${plaza.plazaName}"></td>
+                <td th:text="${plaza.highwayName}"></td>
+                <td th:text="${plaza.city}"></td>
+                <td th:text="${plaza.state}"></td>
+                <td th:text="${plaza.plazaStatus}"></td>
+                <td>
+                    <div class="actions">
+                        <a class="view"
+                           th:href="@{/plazas/details/{id}(id=${plaza.plazaId})}">
+                            View
+                        </a>
+                        <a class="edit"
+                           th:href="@{/plazas/edit/{id}(id=${plaza.plazaId})}">
+                            Edit
+                        </a>
+                        <form th:action="@{/plazas/delete/{id}(id=${plaza.plazaId})}"
+                              method="post"
+                              onsubmit="return confirm('Delete this toll plaza?');">
+                            <button type="submit" class="delete">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(tollPlazas)}">
+                <td colspan="7">No toll plazas found.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p style="margin-top: 25px;">
+        <a th:href="@{/}" class="back">← Back to Dashboard</a>
+    </p>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const search = document.getElementById("plazaSearch");
+    const cityFilter = document.getElementById("cityFilter");
+    const stateFilter = document.getElementById("stateFilter");
+    const statusFilter = document.getElementById("statusFilter");
+    const resetButton = document.getElementById("resetFilters");
+    const count = document.getElementById("filterCount");
+
+    const rows = Array.from(
+        document.querySelectorAll(".table-wrap tbody .plaza-row")
+    );
+
+    function populateFilter(select, columnIndex) {
+        const values = [...new Set(
+            rows.map(row => row.cells[columnIndex].textContent.trim())
+                .filter(Boolean)
+        )].sort();
+
+        values.forEach(value => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value;
+            select.appendChild(option);
+        });
+    }
+
+    // Columns: City = 3, State = 4, Status = 5
+    populateFilter(cityFilter, 3);
+    populateFilter(stateFilter, 4);
+    populateFilter(statusFilter, 5);
+
+    function applyFilters() {
+        const query = search.value.trim().toLowerCase();
+        const city = cityFilter.value;
+        const state = stateFilter.value;
+        const status = statusFilter.value;
+        let visible = 0;
+
+        rows.forEach(row => {
+            const plazaName = row.cells[1].textContent.toLowerCase();
+            const highway = row.cells[2].textContent.toLowerCase();
+
+            const matchesSearch =
+                plazaName.includes(query) || highway.includes(query);
+
+            const matchesCity =
+                !city || row.cells[3].textContent.trim() === city;
+
+            const matchesState =
+                !state || row.cells[4].textContent.trim() === state;
+
+            const matchesStatus =
+                !status || row.cells[5].textContent.trim() === status;
+
+            const matches =
+                matchesSearch && matchesCity &&
+                matchesState && matchesStatus;
+
+            row.style.display = matches ? "" : "none";
+
+            if (matches) visible++;
+        });
+
+        count.textContent =
+            `Showing ${visible} of ${rows.length} toll plazas`;
+    }
+
+    search.addEventListener("input", applyFilters);
+    cityFilter.addEventListener("change", applyFilters);
+    stateFilter.addEventListener("change", applyFilters);
+    statusFilter.addEventListener("change", applyFilters);
+
+    resetButton.addEventListener("click", function () {
+        search.value = "";
+        cityFilter.value = "";
+        stateFilter.value = "";
+        statusFilter.value = "";
+        applyFilters();
+    });
+
+    applyFilters();
+});
+</script>
+
+
+</body>
+</html>

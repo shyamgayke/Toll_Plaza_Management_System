@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Toll Plaza Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .login-card {
+            background: white;
+            padding: 32px;
+            width: 340px;
+            max-width: calc(100% - 48px);
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            color: #17365d;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin: 16px 0 6px;
+        }
+
+        input {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccd5e0;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 12px;
+            color: white;
+            background: #17365d;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .message {
+            color: #b42318;
+            font-size: 14px;
+        }
+
+        .success {
+            color: #18753c;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>Toll Plaza Management</h2>
+    <p>Sign in to continue.</p>
+
+    <p class="message" th:if="${param.error}">
+        Invalid username or password.
+    </p>
+
+    <p class="success" th:if="${param.logout}">
+        You have logged out successfully.
+    </p>
+
+    <form th:action="@{/login}" method="post">
+        <label for="username">Username</label>
+        <input id="username" name="username"
+               type="text" required autofocus>
+
+        <label for="password">Password</label>
+        <input id="password" name="password"
+               type="password" required>
+
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Toll Plaza</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            color: #263238;
+            margin: 0;
+            padding: 35px 20px;
+        }
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,.06);
+        }
+        label {
+            display: block;
+            margin-top: 16px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            margin-top: 7px;
+            border: 1px solid #ccd5df;
+            border-radius: 6px;
+        }
+        button, .back {
+            display: inline-block;
+            margin-top: 22px;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #17365d;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .back { background: #64748b; margin-left: 8px; }
+        .error { color: #b42318; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Add Toll Plaza</h1>
+
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+
+    <form th:action="@{/plazas}" th:object="${tollPlaza}" method="post">
+        <label for="plazaId">Plaza ID</label>
+        <input type="number" id="plazaId" th:field="*{plazaId}"
+               min="1" required>
+
+        <label for="plazaName">Plaza Name</label>
+        <input type="text" id="plazaName" th:field="*{plazaName}"
+               maxlength="50" required>
+
+        <label for="highwayName">Highway</label>
+        <input type="text" id="highwayName" th:field="*{highwayName}"
+               maxlength="50" required>
+
+        <label for="city">City</label>
+        <input type="text" id="city" th:field="*{city}"
+               maxlength="30" required>
+
+        <label for="state">State</label>
+        <input type="text" id="state" th:field="*{state}"
+               maxlength="20" required>
+
+        <label for="plazaStatus">Status</label>
+        <select id="plazaStatus" th:field="*{plazaStatus}">
+            <option value="Operational">Operational</option>
+            <option value="Under Maintenance">Under Maintenance</option>
+            <option value="Closed">Closed</option>
+        </select>
+
+        <button type="submit">Add Plaza</button>
+        <a class="back" th:href="@{/}">Cancel</a>
+    </form>
+</div>
+</body>
+</html>

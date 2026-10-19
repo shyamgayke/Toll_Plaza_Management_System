@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            margin: 0;
+            padding: 0;
+            color: #243247;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin-left: 250px;
+            padding: 30px;
+            box-sizing: border-box;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #0000000d;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px;
+            height: 100vh;
+            padding: 25px 15px;
+            box-sizing: border-box;
+            background: #17365d;
+            color: white;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: #e5edf7;
+            text-decoration: none;
+            padding: 13px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: #2878b5;
+            color: white;
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .container {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+
+        h1 { margin-top: 0; }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            background: #2563eb;
+            color: white;
+            border: 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover { background: #1d4ed8; }
+        .secondary { background: #475569; }
+        .secondary:hover { background: #334155; }
+
+        .success {
+            color: #166534;
+            background: #dcfce7;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .error {
+            color: #991b1b;
+            background: #fee2e2;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            padding: 18px;
+            margin: 20px 0;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .filter-form label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .filter-form input,
+        .filter-form select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .filter-actions {
+            display: flex;
+            align-items: end;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-count {
+            color: #475569;
+            margin: 12px 0;
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th { background: #eff6ff; }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        .edit-button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-right: 5px;
+        }
+
+        .edit-button:hover { background: #1d4ed8; }
+
+        .delete-button {
+            background: #dc2626;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover { background: #b91c1c; }
+        .delete-form { display: inline; margin: 0; }
+        .row-actions { white-space: nowrap; }
+
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .container { padding: 15px; }
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div class="container">
+
+    <h1>Payment Management</h1>
+    <p>View, record, search, edit, and manage toll payments.</p>
+
+    <p class="success"
+       th:if="${success}"
+       th:text="${success}"></p>
+
+    <p class="error"
+       th:if="${error}"
+       th:text="${error}"></p>
+
+    <div class="actions">
+        <a class="btn" th:href="@{/payments/new}">
+            + Record Payment
+        </a>
+
+        <a class="btn secondary" th:href="@{/}">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Search and filters -->
+    <form class="filter-form"
+          th:action="@{/payments}"
+          method="get">
+
+        <div>
+            <label for="filterPaymentId">Payment ID</label>
+            <input type="number"
+                   id="filterPaymentId"
+                   name="paymentId"
+                   min="1"
+                   placeholder="Enter Payment ID"
+                   th:value="${filterPaymentId}">
+        </div>
+
+        <div>
+            <label for="filterPaymentDate">Payment Date</label>
+            <input type="date"
+                   id="filterPaymentDate"
+                   name="paymentDate"
+                   th:value="${filterPaymentDate}"
+                   th:attr="max=${today}">
+        </div>
+
+        <div>
+            <label for="filterPaymentMode">Payment Mode</label>
+            <select id="filterPaymentMode" name="paymentMode">
+                <option value="">All Modes</option>
+                <option value="FASTag"
+                        th:selected="${filterPaymentMode == 'FASTag'}">FASTag</option>
+                <option value="Cash"
+                        th:selected="${filterPaymentMode == 'Cash'}">Cash</option>
+                <option value="Card"
+                        th:selected="${filterPaymentMode == 'Card'}">Card</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="filterPaymentStatus">Payment Status</label>
+            <select id="filterPaymentStatus" name="paymentStatus">
+                <option value="">All Statuses</option>
+                <option value="Completed"
+                        th:selected="${filterPaymentStatus == 'Completed'}">Completed</option>
+                <option value="Pending"
+                        th:selected="${filterPaymentStatus == 'Pending'}">Pending</option>
+                <option value="Failed"
+                        th:selected="${filterPaymentStatus == 'Failed'}">Failed</option>
+            </select>
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn">Search</button>
+            <a class="btn secondary" th:href="@{/payments}">Clear Filters</a>
+        </div>
+    </form>
+
+    <p class="filter-count">
+        Matching payments:
+        <strong th:text="${#lists.size(payments)}">0</strong>
+    </p>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Payment ID</th>
+                <th>Date</th>
+                <th>Vehicle ID</th>
+                <th>Vehicle Number</th>
+                <th>Booth ID</th>
+                <th>Mode</th>
+                <th>Status</th>
+                <th>Toll Amount</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="payment : ${payments}">
+                <td th:text="${payment.paymentId}"></td>
+
+                <td th:text="${payment.paymentDate != null ? payment.paymentDate : '-'}"></td>
+
+                <td th:text="${payment.vehicleId != null ? payment.vehicleId : '-'}"></td>
+
+                <td th:text="${payment.vehicle != null ? payment.vehicle.vehicleNumber : '-'}"></td>
+
+                <td th:text="${payment.boothId != null ? payment.boothId : '-'}"></td>
+
+                <td th:text="${payment.paymentMode}"></td>
+                <td th:text="${payment.paymentStatus}"></td>
+                <td th:text="${payment.tollAmount}"></td>
+
+                <td class="row-actions">
+                    <a class="edit-button"
+                       th:href="@{/payments/edit/{id}(id=${payment.paymentId})}">
+                        Edit
+                    </a>
+
+                    <form class="delete-form"
+                          th:action="@{/payments/delete/{id}(id=${payment.paymentId})}"
+                          method="post"
+                          th:attr="data-payment-id=${payment.paymentId}"
+                          onsubmit="return confirm('Are you sure you want to delete payment ID ' + this.dataset.paymentId + '? This action cannot be undone.');">
+
+                        <button type="submit" class="delete-button">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(payments)}">
+                <td colspan="9" class="empty">
+                    No matching payments found.
+                    Try changing your filters or recording a payment.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>

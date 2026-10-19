@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toll Booth Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            margin: 0;
+            padding: 0;
+            color: #243247;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin-left: 250px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px;
+            height: 100vh;
+            padding: 25px 15px;
+            box-sizing: border-box;
+            background: #17365d;
+            color: white;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: #e5edf7;
+            text-decoration: none;
+            padding: 13px 12px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: #2878b5;
+            color: white;
+        }
+
+        h1 { margin-top: 0; }
+
+        .top, .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .top {
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        a, button {
+            display: inline-block;
+            padding: 9px 13px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .primary { background: #2563eb; color: white; }
+        .edit { background: #f59e0b; color: #111827; }
+        .delete { background: #dc2626; color: white; }
+        .back { background: #e5e7eb; color: #111827; }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .success { background: #dcfce7; color: #166534; }
+        .error { background: #fee2e2; color: #991b1b; }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        th { background: #eff4fa; }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 15px;
+            background: #e5e7eb;
+        }
+
+        
+        @media (max-width: 700px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .container {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+<div class="container">
+
+    <div class="top">
+        <div>
+            <h1>Toll Booth Management</h1>
+            <p>View and manage all toll booths.</p>
+        </div>
+
+        <a th:href="@{/booths/new}" class="primary">+ Add Booth</a>
+    </div>
+
+    <div th:if="${success}" class="message success"
+         th:text="${success}"></div>
+
+    <div th:if="${error}" class="message error"
+         th:text="${error}"></div>
+
+
+    <form th:action="@{/booths}" method="get"
+        style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;
+                margin:20px 0; padding:16px; background:#f8fafc;
+                border-radius:8px;">
+
+        <div>
+            <label for="boothId">Booth ID</label>
+            <input type="number" id="boothId" name="boothId"
+                min="1" placeholder="Enter booth ID"
+                th:value="${filterBoothId}"
+                style="padding:10px; border:1px solid #cbd5e1;
+                        border-radius:6px;">
+        </div>
+
+        <div>
+            <label for="boothStatus">Status</label>
+            <select id="boothStatus" name="boothStatus"
+                    style="padding:10px; border:1px solid #cbd5e1;
+                        border-radius:6px;">
+                <option value="">All statuses</option>
+                <option value="Active"
+                        th:selected="${filterBoothStatus == 'Active'}">
+                    Active
+                </option>
+                <option value="Maintenance"
+                        th:selected="${filterBoothStatus == 'Maintenance'}">
+                    Maintenance
+                </option>
+                <option value="Inactive"
+                        th:selected="${filterBoothStatus == 'Inactive'}">
+                    Inactive
+                </option>
+            </select>
+        </div>
+
+        <div>
+            <label for="plazaId">Toll Plaza</label>
+            <select id="plazaId" name="plazaId"
+                    style="padding:10px; border:1px solid #cbd5e1;
+                        border-radius:6px;">
+                <option value="">All plazas</option>
+                <option th:each="plaza : ${plazas}"
+                        th:value="${plaza.plazaId}"
+                        th:text="${plaza.plazaName}"
+                        th:selected="${filterPlazaId != null
+                            and filterPlazaId == plaza.plazaId}">
+                </option>
+            </select>
+        </div>
+
+        <button type="submit"
+                style="background:#2563eb; color:white;
+                    padding:10px 16px; border:0; border-radius:6px;
+                    cursor:pointer;">
+            Search
+        </button>
+
+        <a th:href="@{/booths}"
+        style="background:#e5e7eb; color:#111827;
+                padding:10px 16px; border-radius:6px;
+                text-decoration:none;">
+            Clear
+        </a>
+    </form>
+     
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Booth ID</th>
+                <th>Status</th>
+                <th>Plaza ID</th>
+                <th>Plaza Name</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="booth : ${booths}">
+                <td th:text="${booth.boothId}"></td>
+
+                <td>
+                    <span class="status"
+                          th:text="${booth.boothStatus}"></span>
+                </td>
+
+                <td th:text="${booth.plazaId}"></td>
+
+                <td th:text="${booth.tollPlaza != null
+                    ? booth.tollPlaza.plazaName : 'Not assigned'}"></td>
+
+                <td>
+                    <div class="actions">
+                        <a class="edit"
+                           th:href="@{/booths/edit/{id}(id=${booth.boothId})}">
+                            Edit
+                        </a>
+
+                        <form th:action="@{/booths/delete/{id}(id=${booth.boothId})}"
+                              method="post"
+                              onsubmit="return confirm('Are you sure you want to delete this booth?');">
+
+                            <button type="submit" class="delete">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(booths)}">
+                <td colspan="5">No toll booths found.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p style="margin-top: 25px;">
+        <a th:href="@{/}" class="back">← Back to Dashboard</a>
+    </p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toll Plaza Details</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            color: #263238;
+            margin: 0;
+            padding: 35px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1, h2 {
+            color: #17365d;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            margin-top: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e5eaf0;
+        }
+
+        th {
+            background: #edf3fa;
+            color: #17365d;
+        }
+
+        .empty {
+            color: #666;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 11px 18px;
+            background: #17365d;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back:hover {
+            background: #102844;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Toll Plaza Details</h1>
+
+    <!-- Basic Plaza Information -->
+    <div class="panel">
+        <h2>Plaza Information</h2>
+
+        <table>
+            <tr>
+                <th>Plaza ID</th>
+                <td th:text="${tollPlaza.plazaId}"></td>
+            </tr>
+            <tr>
+                <th>Plaza Name</th>
+                <td th:text="${tollPlaza.plazaName}"></td>
+            </tr>
+            <tr>
+                <th>Highway</th>
+                <td th:text="${tollPlaza.highwayName}"></td>
+            </tr>
+            <tr>
+                <th>City</th>
+                <td th:text="${tollPlaza.city}"></td>
+            </tr>
+            <tr>
+                <th>State</th>
+                <td th:text="${tollPlaza.state}"></td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td th:text="${tollPlaza.plazaStatus}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Toll Booths -->
+    <div class="panel">
+        <h2>Toll Booths</h2>
+
+        <p class="empty"
+           th:if="${#lists.isEmpty(tollPlaza.booths)}">
+            No toll booths associated with this plaza.
+        </p>
+
+        <table th:unless="${#lists.isEmpty(tollPlaza.booths)}">
+            <thead>
+            <tr>
+                <th>Booth ID</th>
+                <th>Booth Status</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="booth : ${tollPlaza.booths}">
+                <td th:text="${booth.boothId}"></td>
+                <td th:text="${booth.boothStatus}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Contact Numbers -->
+    <div class="panel">
+        <h2>Contact Numbers</h2>
+
+        <p class="empty"
+           th:if="${#lists.isEmpty(tollPlaza.contacts)}">
+            No contact numbers associated with this plaza.
+        </p>
+
+        <table th:unless="${#lists.isEmpty(tollPlaza.contacts)}">
+            <thead>
+            <tr>
+                <th>Contact Number</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="contact : ${tollPlaza.contacts}">
+                <td th:text="${contact.contactNumber}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a class="back" th:href="@{/}">Back to Home</a>
+
+</div>
+</body>
+</html>

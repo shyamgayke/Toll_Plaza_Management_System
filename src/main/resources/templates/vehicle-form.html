@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${formTitle}">Vehicle Form</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            margin: 0;
+            padding: 35px 20px;
+            color: #263238;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+        }
+
+        .panel {
+            background: white;
+            padding: 28px;
+            margin-top: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            color: #17365d;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #33485c;
+        }
+
+        input, select {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #b6d7f5;
+            border-color: #2878b5;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .save {
+            background: #17365d;
+        }
+
+        .cancel {
+            background: #687786;
+            margin-left: 8px;
+        }
+
+        .error {
+            color: #b42318;
+            background: #fdecec;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #667788;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1 th:text="${formTitle}">Vehicle Form</h1>
+
+    <div class="panel">
+
+        <p class="error"
+           th:if="${error}"
+           th:text="${error}">
+        </p>
+
+        <form th:action="${formAction}"
+              th:object="${vehicle}"
+              method="post">
+
+            <div class="form-group">
+                <label for="vehicleId">Vehicle ID *</label>
+
+                <input type="number"
+                       id="vehicleId"
+                       th:field="*{vehicleId}"
+                       th:readonly="${vehicle.vehicleId != null}"
+                       required>
+
+                <p class="hint">
+                    Enter a unique ID for a new vehicle. The ID cannot be changed when editing.
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleNumber">Vehicle Number *</label>
+
+                <input type="text"
+                       id="vehicleNumber"
+                       th:field="*{vehicleNumber}"
+                       maxlength="15"
+                       placeholder="e.g. TN01AB1234"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label for="fasTagNumber">FASTag Number</label>
+
+                <input type="text"
+                       id="fasTagNumber"
+                       th:field="*{fasTagNumber}"
+                       maxlength="20"
+                       placeholder="Enter FASTag number">
+            </div>
+
+            <div class="form-group">
+                <label for="passId">Pass ID</label>
+
+                <input type="number"
+                       id="passId"
+                       th:field="*{passId}"
+                       placeholder="Enter pass ID">
+            </div>
+
+            <div class="form-group">
+                <label for="passType">Pass Type</label>
+
+                <select id="passType" th:field="*{passType}">
+                    <option value="">-- Select Pass Type --</option>
+                    <option value="Daily">Daily</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Annual">Annual</option>
+                    <option value="Return">Return</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="vehicleCategory">Vehicle Category</label>
+
+                <select id="vehicleCategory" th:field="*{vehicleCategory}">
+                    <option value="">-- Select Category --</option>
+                    <option value="Car">Car</option>
+                    <option value="Bus">Bus</option>
+                    <option value="Truck">Truck</option>
+                    <option value="LCV">LCV</option>
+                    <option value="Bike">Bike</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <button type="submit" class="button save">
+                Save Vehicle
+            </button>
+
+            <a class="button cancel" th:href="@{/vehicles}">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

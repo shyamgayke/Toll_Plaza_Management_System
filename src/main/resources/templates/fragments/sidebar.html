@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside class="sidebar" th:fragment="sidebar">
+    <h2>Toll Manager</h2>
+
+    <nav>
+        <a th:href="@{/}" th:classappend="${activePage == 'dashboard'} ? ' active' : ''">
+            ▦ Dashboard
+        </a>
+        
+        <a th:href="@{/plazas}" th:classappend="${activePage == 'plazas'} ? ' active' : ''">
+            ▤ Toll Plazas
+        </a>
+
+        <a th:href="@{/vehicles}" th:classappend="${activePage == 'vehicles'} ? ' active' : ''">
+            🚗 Vehicles
+        </a>
+        <a th:href="@{/payments}" th:classappend="${activePage == 'payments'} ? ' active' : ''">
+            ₹ Payments
+        </a>
+        <a th:href="@{/booths}" th:classappend="${activePage == 'booths'} ? ' active' : ''">
+            ▥ Toll Booths
+        </a>
+        <a th:href="@{/reports}" th:classappend="${activePage == 'reports'} ? ' active' : ''">
+            ▧ Reports
+        </a>
+    </nav>
+
+    
+    <form th:action="@{/logout}" method="post" style="margin: 15px;">
+        <button type="submit"
+                style="width: 100%; padding: 12px;
+                    background: #c62828; color: white;
+                    border: none; border-radius: 7px;
+                    cursor: pointer; font-size: 15px;">
+            Logout
+        </button>
+    </form>
+
+</aside>
+
+</body>
+</html>

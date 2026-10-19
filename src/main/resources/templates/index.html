@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Toll Plaza Management System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            margin: 0;
+            padding: 0;
+            color: #263238;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin-left: 250px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #17365d;
+        }
+
+        .add-button,
+        .edit-button,
+        .details-button {
+            display: inline-block;
+            padding: 9px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .add-button {
+            background: #17365d;
+        }
+
+        .edit-button {
+            background: #2878b5;
+        }
+
+        .details-button {
+            background: #287b55;
+        }
+
+        .add-button:hover {
+            background: #102844;
+        }
+
+        .edit-button:hover {
+            background: #1d5e8e;
+        }
+
+        .details-button:hover {
+            background: #1e6042;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 22px;
+        }
+
+        .dashboard-card {
+            background: white;
+            padding: 24px;
+            border: 1px solid #e8edf4;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(23, 54, 93, 0.05);
+            min-width: 0;
+        }
+
+        .dashboard-card h3 {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-top: 0;
+        }
+
+        .dashboard-card h2 {
+            color: #17365d;
+            font-size: 28px;
+            margin-bottom: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .dashboard-card p {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 0;
+        }
+
+        .revenue-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5eaf0;
+        }
+
+        .revenue-row:last-child {
+            border-bottom: none;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            margin-top: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5eaf0;
+        }
+
+        th {
+            background: #edf3fa;
+            color: #17365d;
+        }
+
+        .empty {
+            color: #666;
+            padding: 20px 0;
+        }
+
+        .success {
+            color: #18753c;
+            background: #e8f7ed;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .error {
+            color: #b42318;
+            background: #fdecec;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .delete-button {
+            background: #c62828;
+            color: white;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .delete-button:hover {
+            background: #a51d1d;
+        }
+
+        .actions {
+            white-space: nowrap;
+        }
+
+        .actions form {
+            display: inline;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+
+            th,
+            td {
+                padding: 9px;
+            }
+        }
+
+        /* Sidebar navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 220px;
+            padding: 24px 15px;
+            box-sizing: border-box;
+            background: #17365d;
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar h2 {
+            font-size: 21px;
+            margin: 0 0 28px;
+            color: white;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #dbe7f5;
+            text-decoration: none;
+            padding: 13px 14px;
+            margin-bottom: 7px;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #315780;
+            color: white;
+        }
+
+        .sidebar a.active {
+            font-weight: bold;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                bottom: auto;
+                padding: 12px;
+                position: relative;
+            }
+
+            .sidebar h2 {
+                margin: 0 0 10px;
+            }
+
+            .sidebar nav {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .sidebar a {
+                margin: 0;
+                padding: 10px;
+            }
+
+            .container {
+                margin-left: 0;
+                padding: 18px 12px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="container">
+
+    <div style="display: flex; justify-content: space-between; align-items: center;
+                gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div>
+            <h1 th:text="${title}">Toll Plaza Management System</h1>
+            <p>Overview of toll operations, payments, and revenue.</p>
+        </div>
+
+    </div>
+
+    <!-- Dashboard Summary Cards -->
+    <div class="dashboard">
+
+        <div class="dashboard-card">
+            <h3>Total Toll Plazas</h3>
+            <h2 th:text="${plazaCount}">0</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Total Toll Booths</h3>
+            <h2 th:text="${boothCount}">0</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Total Contact Numbers</h3>
+            <h2 th:text="${contactCount}">0</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Total Payment Records</h3>
+            <h2 th:text="${paymentCount}">0</h2>
+            <p>All payment statuses</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Completed Payments</h3>
+            <h2 th:text="${completedPaymentCount}">0</h2>
+            <p>Successfully completed</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Total Toll Revenue</h3>
+            <h2>
+                ₹<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)}">0.00</span>
+            </h2>
+            <p>From completed payments</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Maintenance Booths</h3>
+            <h2 th:text="${maintenanceBoothCount}">0</h2>
+            <p>Currently under maintenance</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Today's Completed Payments</h3>
+            <h2 th:text="${todayPaymentCount}">0</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Today's Toll Revenue</h3>
+            <h2>
+                ₹<span th:text="${#numbers.formatDecimal(todayRevenue, 1, 2)}">0.00</span>
+            </h2>
+        </div>
+
+    </div>
+
+    <!-- Revenue by Payment Mode -->
+    <div class="panel">
+
+        <h2>Revenue by Payment Mode</h2>
+
+        <p class="empty" th:if="${#maps.isEmpty(revenueByMode)}">
+            No completed payment records available.
+        </p>
+
+        <div th:each="entry : ${revenueByMode}" class="revenue-row">
+            <strong th:text="${entry.key}">FASTag</strong>
+
+            <span>
+                ₹<span th:text="${#numbers.formatDecimal(entry.value, 1, 2)}">0.00</span>
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="panel">
+        <h2>Revenue Distribution by Payment Mode</h2>
+
+        <div th:if="${#maps.isEmpty(revenueByMode)}" class="empty">
+            No revenue data available to display.
+        </div>
+
+        <div th:unless="${#maps.isEmpty(revenueByMode)}"
+             style="max-width: 500px; height: 380px; margin: 20px auto;">
+            <canvas id="revenuePieChart"></canvas>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const revenueLabels = /*[[${revenueByMode.keySet()}]]*/ [];
+        const revenueValues = /*[[${revenueByMode.values()}]]*/ [];
+
+        const revenueColors = [
+            '#2563eb',
+            '#16a34a',
+            '#f59e0b',
+            '#9333ea',
+            '#ef4444'
+        ];
+
+        const canvas = document.getElementById('revenuePieChart');
+
+        if (canvas) {
+            new Chart(canvas, {
+                type: 'pie',
+                plugins: [ChartDataLabels],
+                data: {
+                    labels: revenueLabels,
+                    datasets: [{
+                        data: revenueValues,
+                        backgroundColor: revenueColors,
+                        borderColor: '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const values = context.dataset.data;
+                                    const total = values.reduce(
+                                        (sum, value) => sum + Number(value), 0
+                                    );
+                                    const amount = Number(context.raw);
+                                    const percentage = total > 0
+                                        ? (amount / total * 100).toFixed(1)
+                                        : '0.0';
+
+                                    return ' ₹' + amount.toFixed(2)
+                                        + ' (' + percentage + '%)';
+                                }
+                            }
+                        },
+
+                        datalabels: {
+                            color: '#ffffff',
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            },
+                            formatter: function(value, context) {
+                                const values = context.chart.data.datasets[0].data;
+                                const total = values.reduce(
+                                    (sum, item) => sum + Number(item), 0
+                                );
+
+                                if (total === 0) {
+                                    return '';
+                                }
+
+                                return (Number(value) / total * 100).toFixed(1) + '%';
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+    <!-- Success Message -->
+    <p class="success"
+       th:if="${success}"
+       th:text="${success}">
+    </p>
+
+    <!-- Error Message -->
+    <p class="error"
+       th:if="${error}"
+       th:text="${error}">
+    </p>
+
+</div>
+
+</body>
+</html>
