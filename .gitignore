@@ -3,6 +3,7 @@ node_modules/
 .vscode/
 .idea/
 *.log
+*.sql
 .env
 .env.*
 !.env.example
